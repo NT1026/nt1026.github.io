@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="在網路剛起步時，安全性並不是主機之間傳遞資訊的首要考量，像 Telnet、HTTP 等協定，皆是以明文(plaintext)的方式進行傳遞。 隨著技術的發展，人們逐漸意識到未加密的訊息在網路上傳遞具有非常大的風險，因此誕生了 SSH (Secure Shell Protocol) 這個加密後的網路傳輸協定，讓我們在與遠端設備連線時，能先將訊息加密後傳送，確保連線流量不被竊聽。 SSH 基本觀念SS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[SSH] SSH 原理與身分驗證">
+<meta property="og:url" content="https://nt1026.github.io/ssh/ssh-public-key-auth/">
+<meta property="og:site_name" content="nt1026&#39;S blog">
+<meta property="og:description" content="在網路剛起步時，安全性並不是主機之間傳遞資訊的首要考量，像 Telnet、HTTP 等協定，皆是以明文(plaintext)的方式進行傳遞。 隨著技術的發展，人們逐漸意識到未加密的訊息在網路上傳遞具有非常大的風險，因此誕生了 SSH (Secure Shell Protocol) 這個加密後的網路傳輸協定，讓我們在與遠端設備連線時，能先將訊息加密後傳送，確保連線流量不被竊聽。 SSH 基本觀念SS">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-11-17T15:59:34.000Z">
+<meta property="article:modified_time" content="2024-11-17T15:59:57.212Z">
+<meta property="article:author" content="nt1026">
+<meta property="article:tag" content="ssh">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/lock.png">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/lock.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/lock.png">
+        
+      
+    
+    <!-- title -->
+    <title>[SSH] SSH 原理與身分驗證</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">home</a></li><!--
+     --><!--
+       --><li><a href="/whoami/">whoami</a></li><!--
+     --><!--
+       --><li><a href="/archives/">ls</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/tags/">tags</a></li><!--
+     --><!--
+       --><li><a href="/search/">search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/cybersecurity/CKC/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://nt1026.github.io/ssh/ssh-public-key-auth/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://nt1026.github.io/ssh/ssh-public-key-auth/&text=[SSH] SSH 原理與身分驗證"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://nt1026.github.io/ssh/ssh-public-key-auth/&title=[SSH] SSH 原理與身分驗證"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://nt1026.github.io/ssh/ssh-public-key-auth/&is_video=false&description=[SSH] SSH 原理與身分驗證"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=[SSH] SSH 原理與身分驗證&body=Check out this article: https://nt1026.github.io/ssh/ssh-public-key-auth/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://nt1026.github.io/ssh/ssh-public-key-auth/&title=[SSH] SSH 原理與身分驗證"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://nt1026.github.io/ssh/ssh-public-key-auth/&title=[SSH] SSH 原理與身分驗證"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://nt1026.github.io/ssh/ssh-public-key-auth/&title=[SSH] SSH 原理與身分驗證"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://nt1026.github.io/ssh/ssh-public-key-auth/&title=[SSH] SSH 原理與身分驗證"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://nt1026.github.io/ssh/ssh-public-key-auth/&name=[SSH] SSH 原理與身分驗證&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://nt1026.github.io/ssh/ssh-public-key-auth/&t=[SSH] SSH 原理與身分驗證"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#SSH-%E5%9F%BA%E6%9C%AC%E8%A7%80%E5%BF%B5"><span class="toc-number">1.</span> <span class="toc-text">SSH 基本觀念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%83%85%E5%A2%83%E4%B8%80-%E5%BB%BA%E7%AB%8B%E5%9F%BA%E6%9C%AC%E7%9A%84-SSH-%E9%80%A3%E7%B7%9A"><span class="toc-number">1.1.</span> <span class="toc-text">[情境一] 建立基本的 SSH 連線</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SSH-%E8%BA%AB%E4%BB%BD%E9%A9%97%E8%AD%89"><span class="toc-number">2.</span> <span class="toc-text">SSH 身份驗證</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%A2%E6%88%B6%E7%AB%AF%E5%A6%82%E4%BD%95%E9%A9%97%E8%AD%89%E4%BC%BA%E6%9C%8D%E5%99%A8%E8%BA%AB%E4%BB%BD%EF%BC%9F"><span class="toc-number">2.1.</span> <span class="toc-text">客戶端如何驗證伺服器身份？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%BA%E6%9C%8D%E5%99%A8%E7%AB%AF%E5%A6%82%E4%BD%95%E9%A9%97%E8%AD%89%E5%AE%A2%E6%88%B6%E7%AB%AF%E8%BA%AB%E4%BB%BD%EF%BC%9F"><span class="toc-number">2.2.</span> <span class="toc-text">伺服器端如何驗證客戶端身份？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%83%85%E5%A2%83%E4%BA%8C-%E5%85%AC%E9%96%8B%E9%87%91%E9%91%B0%E8%AA%8D%E8%AD%89"><span class="toc-number">2.3.</span> <span class="toc-text">[情境二] 公開金鑰認證</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="toc-number">3.</span> <span class="toc-text">參考資料</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        [SSH] SSH 原理與身分驗證
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">nt1026</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2024-11-17T15:59:34.000Z" class="dt-published" itemprop="datePublished">2024-11-17</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/ssh/">ssh</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/ssh/" rel="tag">ssh</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>在網路剛起步時，安全性並不是主機之間傳遞資訊的首要考量，像 Telnet、HTTP 等協定，皆是以<u><strong>明文(plaintext)</strong></u>的方式進行傳遞。</p>
+<p>隨著技術的發展，人們逐漸意識到未加密的訊息在網路上傳遞具有非常大的風險，因此誕生了 SSH (Secure Shell Protocol) 這個加密後的<u><strong>網路傳輸協定</strong></u>，讓我們在與遠端設備連線時，能先將訊息加密後傳送，確保連線流量不被竊聽。</p>
+<h2 id="SSH-基本觀念"><a href="#SSH-基本觀念" class="headerlink" title="SSH 基本觀念"></a>SSH 基本觀念</h2><p>SSH 採用的是 <u><strong>client-server</strong></u> 模型，也就是說，我們可以透過 SSH client 向已經啟動 SSH daemon (sshd) 服務的主機進行連線。</p>
+<p>SSH daemon 啟動之後，預設會監聽來自 <u><strong>port 22</strong></u> 的 TCP 連線。當有連線進來後，伺服器端首先會驗證使用者的身份，假如驗證失敗，則將這次的連線中斷；假如驗證成功，伺服器端與用戶端會透過交換密鑰的過程，來對未來的數據傳輸進行加密。</p>
+<h3 id="情境一-建立基本的-SSH-連線"><a href="#情境一-建立基本的-SSH-連線" class="headerlink" title="[情境一] 建立基本的 SSH 連線"></a>[情境一] 建立基本的 SSH 連線</h3><p>假設我們希望使用 nt1026 這個使用者，向 IP 為 192.168.0.100 的主機進行 SSH 連線。</p>
+<p>檢查伺服器端 SSH daemon 是否已經啟動：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ systemctl status sshd</span><br></pre></td></tr></table></figure>
+
+<p>從客戶端向伺服器端發送 SSH 連線請求：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh nt1026@192.168.0.100</span><br></pre></td></tr></table></figure>
+
+<p>如果 192.168.0.100 的 SSH daemon 有在 port 22 正常運行，那我們在輸入 nt1026 的密碼進行驗證後，就能夠以 nt1026 的身份順利連線到 192.168.0.100 操作主機了。</p>
+<h2 id="SSH-身份驗證"><a href="#SSH-身份驗證" class="headerlink" title="SSH 身份驗證"></a>SSH 身份驗證</h2><p>現代密碼學大致上可分為對稱加密、非對稱加密、雜湊函數等等，我們知道 SSH 是為了提升安全性而產生的一個協定，因此身份驗證主要會採用<u><strong>非對稱加密</strong></u>的技術實作，如：RSA、ED25519 等等。</p>
+<h3 id="客戶端如何驗證伺服器身份？"><a href="#客戶端如何驗證伺服器身份？" class="headerlink" title="客戶端如何驗證伺服器身份？"></a>客戶端如何驗證伺服器身份？</h3><p>想像以下情境：攻擊者建立了一個偽造的 SSH 伺服器，並要求使用者輸入密碼，若使用者在未察覺的情況下輸入密碼，則攻擊者就能取得這些驗證資訊，藉此訪問真正的伺服器。</p>
+<p>為了防止這樣的<u><strong>中間人攻擊(Man-In-The-Middle Attack)</strong></u>，我們在向伺服器發送第一次的 SSH 請求時，SSH client 會要求我們校驗伺服器的<u><strong>公鑰指紋(fingerprint)</strong></u>，以確保伺服器的身份：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ECDSA key fingerprint is SHA256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxx.</span><br><span class="line">This key is not known by any other names.</span><br><span class="line">Are you sure you want to <span class="built_in">continue</span> connecting (<span class="built_in">yes</span>/no/[fingerprint])?</span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>SHA256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxx</code> 就是 SSH client 取得的伺服器公鑰指紋。而我們可以在伺服器上執行以下指令來取得真正的伺服器公鑰指紋：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh-keygen -E sha256 -lf /etc/ssh/ssh_host_ecdsa_key.pub</span><br></pre></td></tr></table></figure>
+
+<p>將兩者進行比對後，就能驗證伺服器的身份了。</p>
+<h3 id="伺服器端如何驗證客戶端身份？"><a href="#伺服器端如何驗證客戶端身份？" class="headerlink" title="伺服器端如何驗證客戶端身份？"></a>伺服器端如何驗證客戶端身份？</h3><p>我們在情境一的時候使用了密碼來進行身份的驗證，也就是說，用戶端將加密後的密碼傳遞給伺服器，並透過比對來進行認證。然而簡單的密碼很容易遭到暴力破解。因此為了安全性的考量，目前已不再推薦使用密碼驗證身份，而是改為使用<u><strong>公開金鑰認證(Public-Key Authentication)</strong></u>的方式來讓伺服器驗證客戶端身份。</p>
+<p>公開金鑰認證的原理是使用非對稱式加密的<u><strong>公鑰(public-key)</strong></u>和<u><strong>私鑰(private-key)</strong></u>進行配對，來避免密碼被猜測或破解的風險，其運作流程如下：</p>
+<ol>
+<li>客戶端產生一個金鑰對</li>
+<li>將客戶端的公鑰放在伺服器上</li>
+</ol>
+<p>當客戶端發送 SSH 請求時，會進行一段挑戰碼交換驗證的過程：</p>
+<ol start="3">
+<li>客戶端發送自己的公鑰，讓伺服器去清單 (通常是 <code>~/.ssh/authorized_keys</code> 這個檔案) 中檢查是否有記錄過</li>
+<li>如果匹配成功，則伺服器產生一個隨機的<u><strong>挑戰碼(Challenge)</strong></u></li>
+<li>伺服器用客戶端的公鑰將挑戰碼加密後傳給客戶端</li>
+<li>客戶端使用自己的私鑰對其進行解密後，用雜湊函數加密後回傳給伺服器</li>
+<li>伺服器用同樣的雜湊函數加密自己產生的挑戰碼，比對自己產生的雜湊挑戰碼和客戶端傳來的雜湊挑戰碼，以此來驗證客戶端的身份</li>
+</ol>
+<p>透過公開金鑰認證，我們可以取得比密碼驗證還要更高的安全性，甚至可以免去輸入密碼的步驟來進行連線。</p>
+<h3 id="情境二-公開金鑰認證"><a href="#情境二-公開金鑰認證" class="headerlink" title="[情境二] 公開金鑰認證"></a>[情境二] 公開金鑰認證</h3><p>假設我們希望以 nt1026 這個使用者，使用公開金鑰認證的方式向 IP 為 192.168.0.100 進行 SSH 連線。</p>
+<p>首先，我們在客戶端使用以下指令產生一個金鑰對：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh-keygen</span><br></pre></td></tr></table></figure>
+
+<p>金鑰預設儲存的位置在 <code>~/.ssh/</code> 目錄底下，也可以設定 passphrase 來設定密碼保護私鑰。</p>
+<p>再來我們將公鑰 (<code>id_ed25519.pub</code>) 的內容寫入到伺服器端的 <code>~/.ssh/authorized_keys</code> 檔案中：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh-copy-id -i <span class="string">&quot;~/.ssh/id_ed25519.pub&quot;</span> nt1026@192.168.0.100</span><br></pre></td></tr></table></figure>
+
+<p>進入伺服器端的 <code>/etc/ssh/sshd_config</code> 檔案關閉密碼認證，並啟用公開金鑰認證：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PasswordAuthentication no</span><br><span class="line">PubkeyAuthentication <span class="built_in">yes</span></span><br></pre></td></tr></table></figure>
+
+<p>重啟伺服器的 sshd 服務：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ systemctl restart sshd</span><br></pre></td></tr></table></figure>
+
+<p>最後就可以從客戶端使用公開金鑰認證進行無密碼登入了：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh nt1026@192.168.0.100</span><br></pre></td></tr></table></figure>
+
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/zh-tw/Secure_Shell">Secure Shell - 維基百科，自由的百科全書</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/informatics/p/17557907.html">SSH 原理与实践（一） - warm3snow - 博客园</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.gtwang.org/linux/linux-ssh-public-key-authentication/">SSH 公開金鑰認證：不用打密碼登入 Linux 設定教學，安全又方便 – G. T. Wang</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/starbugs/security-%E4%BD%A0%E8%A9%B2%E7%9F%A5%E9%81%93%E6%89%80%E6%9C%89%E9%97%9C%E6%96%BC-ssh-%E7%9A%84%E9%82%A3%E4%BA%9B%E4%BA%8B-76b3518cb747">[Security] 你該知道所有關於 SSH 的那些事. 是什麼、怎麼用、要小心什麼 | by 施靜樺 | Starbugs Weekly 星巴哥技術專欄 | Medium</a></li>
+<li><a target="_blank" rel="noopener" href="https://hackmd.io/@yanren1996/rk9OUfY1i">SSH 加密過程 - HackMD</a></li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">home</a></li>
+        
+          <li><a href="/whoami/">whoami</a></li>
+        
+          <li><a href="/archives/">ls</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/tags/">tags</a></li>
+        
+          <li><a href="/search/">search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#SSH-%E5%9F%BA%E6%9C%AC%E8%A7%80%E5%BF%B5"><span class="toc-number">1.</span> <span class="toc-text">SSH 基本觀念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%83%85%E5%A2%83%E4%B8%80-%E5%BB%BA%E7%AB%8B%E5%9F%BA%E6%9C%AC%E7%9A%84-SSH-%E9%80%A3%E7%B7%9A"><span class="toc-number">1.1.</span> <span class="toc-text">[情境一] 建立基本的 SSH 連線</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SSH-%E8%BA%AB%E4%BB%BD%E9%A9%97%E8%AD%89"><span class="toc-number">2.</span> <span class="toc-text">SSH 身份驗證</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%A2%E6%88%B6%E7%AB%AF%E5%A6%82%E4%BD%95%E9%A9%97%E8%AD%89%E4%BC%BA%E6%9C%8D%E5%99%A8%E8%BA%AB%E4%BB%BD%EF%BC%9F"><span class="toc-number">2.1.</span> <span class="toc-text">客戶端如何驗證伺服器身份？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%BA%E6%9C%8D%E5%99%A8%E7%AB%AF%E5%A6%82%E4%BD%95%E9%A9%97%E8%AD%89%E5%AE%A2%E6%88%B6%E7%AB%AF%E8%BA%AB%E4%BB%BD%EF%BC%9F"><span class="toc-number">2.2.</span> <span class="toc-text">伺服器端如何驗證客戶端身份？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%83%85%E5%A2%83%E4%BA%8C-%E5%85%AC%E9%96%8B%E9%87%91%E9%91%B0%E8%AA%8D%E8%AD%89"><span class="toc-number">2.3.</span> <span class="toc-text">[情境二] 公開金鑰認證</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="toc-number">3.</span> <span class="toc-text">參考資料</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://nt1026.github.io/ssh/ssh-public-key-auth/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://nt1026.github.io/ssh/ssh-public-key-auth/&text=[SSH] SSH 原理與身分驗證"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://nt1026.github.io/ssh/ssh-public-key-auth/&title=[SSH] SSH 原理與身分驗證"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://nt1026.github.io/ssh/ssh-public-key-auth/&is_video=false&description=[SSH] SSH 原理與身分驗證"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=[SSH] SSH 原理與身分驗證&body=Check out this article: https://nt1026.github.io/ssh/ssh-public-key-auth/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://nt1026.github.io/ssh/ssh-public-key-auth/&title=[SSH] SSH 原理與身分驗證"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://nt1026.github.io/ssh/ssh-public-key-auth/&title=[SSH] SSH 原理與身分驗證"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://nt1026.github.io/ssh/ssh-public-key-auth/&title=[SSH] SSH 原理與身分驗證"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://nt1026.github.io/ssh/ssh-public-key-auth/&title=[SSH] SSH 原理與身分驗證"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://nt1026.github.io/ssh/ssh-public-key-auth/&name=[SSH] SSH 原理與身分驗證&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://nt1026.github.io/ssh/ssh-public-key-auth/&t=[SSH] SSH 原理與身分驗證"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024
+    nt1026
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">home</a></li><!--
+     --><!--
+       --><li><a href="/whoami/">whoami</a></li><!--
+     --><!--
+       --><li><a href="/archives/">ls</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/tags/">tags</a></li><!--
+     --><!--
+       --><li><a href="/search/">search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
