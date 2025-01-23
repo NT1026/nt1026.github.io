@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="查詢系統狀態Linux 核心版本12uname -acat &#x2F;proc&#x2F;version CPU1234cat &#x2F;proc&#x2F;cpuinfolscpudmidecodeuname -m 程序1ps 記憶體1cat &#x2F;proc&#x2F;meminfo 裝置12ls -al &#x2F;sys&#x2F;devices # 列出所有裝置mount # 列出已掛載的裝置 模組123456find &#x2F;lib&#x2F;modules&#x2F;$(unam">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux 筆記">
+<meta property="og:url" content="https://nt1026.github.io/note/linux-note/">
+<meta property="og:site_name" content="nt1026&#39;S blog">
+<meta property="og:description" content="查詢系統狀態Linux 核心版本12uname -acat &#x2F;proc&#x2F;version CPU1234cat &#x2F;proc&#x2F;cpuinfolscpudmidecodeuname -m 程序1ps 記憶體1cat &#x2F;proc&#x2F;meminfo 裝置12ls -al &#x2F;sys&#x2F;devices # 列出所有裝置mount # 列出已掛載的裝置 模組123456find &#x2F;lib&#x2F;modules&#x2F;$(unam">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-01-23T02:02:42.000Z">
+<meta property="article:modified_time" content="2025-01-23T02:05:26.951Z">
+<meta property="article:author" content="nt1026">
+<meta property="article:tag" content="linux">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/lock.png">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/lock.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/lock.png">
+        
+      
+    
+    <!-- title -->
+    <title>Linux 筆記</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">home</a></li><!--
+     --><!--
+       --><li><a href="/whoami/">whoami</a></li><!--
+     --><!--
+       --><li><a href="/archives/">ls</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/tags/">tags</a></li><!--
+     --><!--
+       --><li><a href="/search/">search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/ssh/ssh-public-key-auth/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://nt1026.github.io/note/linux-note/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://nt1026.github.io/note/linux-note/&text=Linux 筆記"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://nt1026.github.io/note/linux-note/&title=Linux 筆記"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://nt1026.github.io/note/linux-note/&is_video=false&description=Linux 筆記"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Linux 筆記&body=Check out this article: https://nt1026.github.io/note/linux-note/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://nt1026.github.io/note/linux-note/&title=Linux 筆記"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://nt1026.github.io/note/linux-note/&title=Linux 筆記"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://nt1026.github.io/note/linux-note/&title=Linux 筆記"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://nt1026.github.io/note/linux-note/&title=Linux 筆記"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://nt1026.github.io/note/linux-note/&name=Linux 筆記&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://nt1026.github.io/note/linux-note/&t=Linux 筆記"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9F%A5%E8%A9%A2%E7%B3%BB%E7%B5%B1%E7%8B%80%E6%85%8B"><span class="toc-number">1.</span> <span class="toc-text">查詢系統狀態</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Linux-%E6%A0%B8%E5%BF%83%E7%89%88%E6%9C%AC"><span class="toc-number">1.1.</span> <span class="toc-text">Linux 核心版本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CPU"><span class="toc-number">1.2.</span> <span class="toc-text">CPU</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F"><span class="toc-number">1.3.</span> <span class="toc-text">程序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A8%98%E6%86%B6%E9%AB%94"><span class="toc-number">1.4.</span> <span class="toc-text">記憶體</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A3%9D%E7%BD%AE"><span class="toc-number">1.5.</span> <span class="toc-text">裝置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E7%B5%84"><span class="toc-number">1.6.</span> <span class="toc-text">模組</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%95%B6%E5%89%8D%E7%92%B0%E5%A2%83%E8%AE%8A%E6%95%B8"><span class="toc-number">1.7.</span> <span class="toc-text">當前環境變數</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B6%B2%E8%B7%AF%E7%9B%B8%E9%97%9C"><span class="toc-number">2.</span> <span class="toc-text">網路相關</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%8D%E5%9D%80"><span class="toc-number">2.1.</span> <span class="toc-text">位址</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B7%AF%E7%94%B1"><span class="toc-number">2.2.</span> <span class="toc-text">路由</span></a></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Linux 筆記
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">nt1026</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-01-23T02:02:42.000Z" class="dt-published" itemprop="datePublished">2025-01-23</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/note/">note</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/linux/" rel="tag">linux</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h2 id="查詢系統狀態"><a href="#查詢系統狀態" class="headerlink" title="查詢系統狀態"></a>查詢系統狀態</h2><h3 id="Linux-核心版本"><a href="#Linux-核心版本" class="headerlink" title="Linux 核心版本"></a>Linux 核心版本</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">uname</span> -a</span><br><span class="line"><span class="built_in">cat</span> /proc/version</span><br></pre></td></tr></table></figure>
+<h3 id="CPU"><a href="#CPU" class="headerlink" title="CPU"></a>CPU</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> /proc/cpuinfo</span><br><span class="line">lscpu</span><br><span class="line">dmidecode</span><br><span class="line"><span class="built_in">uname</span> -m</span><br></pre></td></tr></table></figure>
+<h3 id="程序"><a href="#程序" class="headerlink" title="程序"></a>程序</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps</span><br></pre></td></tr></table></figure>
+<h3 id="記憶體"><a href="#記憶體" class="headerlink" title="記憶體"></a>記憶體</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> /proc/meminfo</span><br></pre></td></tr></table></figure>
+<h3 id="裝置"><a href="#裝置" class="headerlink" title="裝置"></a>裝置</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ls</span> -al /sys/devices <span class="comment"># 列出所有裝置</span></span><br><span class="line">mount <span class="comment"># 列出已掛載的裝置</span></span><br></pre></td></tr></table></figure>
+<h3 id="模組"><a href="#模組" class="headerlink" title="模組"></a>模組</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">find /lib/modules/$(<span class="built_in">uname</span> -r) -<span class="built_in">type</span> f -name <span class="string">&#x27;*.ko*&#x27;</span> <span class="comment"># 所有可使用的模組</span></span><br><span class="line">lsmod <span class="comment"># 列出已載入的模組</span></span><br><span class="line">modprobe <span class="comment"># 操作模組</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 其他核心功能擴充方式：</span></span><br><span class="line"><span class="comment"># - eBPF</span></span><br></pre></td></tr></table></figure>
+<h3 id="當前環境變數"><a href="#當前環境變數" class="headerlink" title="當前環境變數"></a>當前環境變數</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">env</span></span><br><span class="line"><span class="built_in">cat</span> /proc/self/environ</span><br></pre></td></tr></table></figure>
+
+<h2 id="網路相關"><a href="#網路相關" class="headerlink" title="網路相關"></a>網路相關</h2><h3 id="位址"><a href="#位址" class="headerlink" title="位址"></a>位址</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ifconfig</span><br><span class="line">ip a</span><br></pre></td></tr></table></figure>
+<h3 id="路由"><a href="#路由" class="headerlink" title="路由"></a>路由</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ip r</span><br></pre></td></tr></table></figure>
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">home</a></li>
+        
+          <li><a href="/whoami/">whoami</a></li>
+        
+          <li><a href="/archives/">ls</a></li>
+        
+          <li><a href="/categories/">categories</a></li>
+        
+          <li><a href="/tags/">tags</a></li>
+        
+          <li><a href="/search/">search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9F%A5%E8%A9%A2%E7%B3%BB%E7%B5%B1%E7%8B%80%E6%85%8B"><span class="toc-number">1.</span> <span class="toc-text">查詢系統狀態</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Linux-%E6%A0%B8%E5%BF%83%E7%89%88%E6%9C%AC"><span class="toc-number">1.1.</span> <span class="toc-text">Linux 核心版本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CPU"><span class="toc-number">1.2.</span> <span class="toc-text">CPU</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F"><span class="toc-number">1.3.</span> <span class="toc-text">程序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A8%98%E6%86%B6%E9%AB%94"><span class="toc-number">1.4.</span> <span class="toc-text">記憶體</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A3%9D%E7%BD%AE"><span class="toc-number">1.5.</span> <span class="toc-text">裝置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E7%B5%84"><span class="toc-number">1.6.</span> <span class="toc-text">模組</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%95%B6%E5%89%8D%E7%92%B0%E5%A2%83%E8%AE%8A%E6%95%B8"><span class="toc-number">1.7.</span> <span class="toc-text">當前環境變數</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B6%B2%E8%B7%AF%E7%9B%B8%E9%97%9C"><span class="toc-number">2.</span> <span class="toc-text">網路相關</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%8D%E5%9D%80"><span class="toc-number">2.1.</span> <span class="toc-text">位址</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B7%AF%E7%94%B1"><span class="toc-number">2.2.</span> <span class="toc-text">路由</span></a></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://nt1026.github.io/note/linux-note/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://nt1026.github.io/note/linux-note/&text=Linux 筆記"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://nt1026.github.io/note/linux-note/&title=Linux 筆記"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://nt1026.github.io/note/linux-note/&is_video=false&description=Linux 筆記"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Linux 筆記&body=Check out this article: https://nt1026.github.io/note/linux-note/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://nt1026.github.io/note/linux-note/&title=Linux 筆記"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://nt1026.github.io/note/linux-note/&title=Linux 筆記"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://nt1026.github.io/note/linux-note/&title=Linux 筆記"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://nt1026.github.io/note/linux-note/&title=Linux 筆記"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://nt1026.github.io/note/linux-note/&name=Linux 筆記&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://nt1026.github.io/note/linux-note/&t=Linux 筆記"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024-2025
+    nt1026
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">home</a></li><!--
+     --><!--
+       --><li><a href="/whoami/">whoami</a></li><!--
+     --><!--
+       --><li><a href="/archives/">ls</a></li><!--
+     --><!--
+       --><li><a href="/categories/">categories</a></li><!--
+     --><!--
+       --><li><a href="/tags/">tags</a></li><!--
+     --><!--
+       --><li><a href="/search/">search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
